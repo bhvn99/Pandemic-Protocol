@@ -1,0 +1,13 @@
+{
+    "name": "corona",
+    "difficulty": "medium",
+    "susceptible": 7799999900,
+    "infected": 100,
+    "recovered": 0,
+    "dead": 0,
+    "infectivity_rate": 1.0,
+    "severity_rate": 0.1,
+    "lethality_rate": 0.05,
+    "timestamp_created": 0,
+    "history": []
+}
