@@ -1,125 +1,77 @@
 import pygame, sys, hashlib, os, json, time
 
-# initialises window, fonts, caption, dimensions,difficulty and other prerequisites
+# Global setup (window, fonts, colours)
 pygame.init()
 WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pandemic Protocol")
 font = pygame.font.Font(None, 36)
-font2big = pygame.font.Font("assets/BR.ttf", 75) 
-font2 = pygame.font.Font("assets/BR.ttf", 40) 
+font2big = pygame.font.Font("assets/BR.ttf", 75)
+font2 = pygame.font.Font("assets/BR.ttf", 40)
 BLACK = (0, 0, 0)
-difficulty = "" 
 
-
-  
-
-# Hashed credentials ( which could later come from a file/database )
+# Hashed credentials (could later come from a file/database)
 USERNAME = "user123"
 HASH_PASSWORD = hashlib.sha256("pass123".encode()).hexdigest()
 
-
 def login_screen():
-    # Displays login UI and handles user inputs - loops until valid login
+    # Displays login UI and handles user input until valid credentials are entered
     text_user, text_pass = "", ""
     active_user = True
     message = ""
 
-    # Rectangles for input boxes
     user_box = pygame.Rect(200, 350, 200, 40)
     pass_box = pygame.Rect(200, 410, 200, 40)
 
-    # Load and scales the background image
     background = pygame.image.load("assets/background.png")
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
     while True:
-        screen.blit(background, (0, 0))  
+        screen.blit(background, (0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if user_box.collidepoint(event.pos):
                     active_user = True
                 elif pass_box.collidepoint(event.pos):
                     active_user = False
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     if active_user:
                         text_user = text_user[:-1]
                     else:
                         text_pass = text_pass[:-1]
+
                 elif event.key == pygame.K_RETURN:
-                    hashedinput = hashlib.sha256(text_pass.encode()).hexdigest()
-                    if text_user == USERNAME and hashedinput == HASH_PASSWORD:
-                        return True   # Successful Hash - leave function
+                    hashed_input = hashlib.sha256(text_pass.encode()).hexdigest()
+                    if text_user == USERNAME and hashed_input == HASH_PASSWORD:
+                        return True
                     else:
                         message = "Login Failed!"
+
                 else:
                     if active_user:
                         text_user += event.unicode
                     else:
                         text_pass += event.unicode
 
-        # Draws input boxes
-        pygame.draw.rect(screen, (0,0,0), user_box, 2)
-        pygame.draw.rect(screen, (0,0,0), pass_box, 2)
+        pygame.draw.rect(screen, (0, 0, 0), user_box, 2)
+        pygame.draw.rect(screen, (0, 0, 0), pass_box, 2)
 
-        # Draws text
-        screen.blit(font.render(text_user, True, (0,0,0)), (user_box.x+5, user_box.y+5))
-        screen.blit(font.render("*"*len(text_pass), True, (0,0,0)), (pass_box.x+5, pass_box.y+5))
+        screen.blit(font.render(text_user, True, (0, 0, 0)), (user_box.x + 5, user_box.y + 5))
+        screen.blit(font.render("*" * len(text_pass), True, (0, 0, 0)), (pass_box.x + 5, pass_box.y + 5))
 
-        # Login Labels
-        screen.blit(font.render("Username:", True, (0,0,0)), (50, 355))
-        screen.blit(font.render("Password:", True, (0,0,0)), (50, 415))
-        screen.blit(font2big.render("Pandemic Protocol", True, (0,0,0)), (55, 100))
+        screen.blit(font.render("Username:", True, (0, 0, 0)), (50, 355))
+        screen.blit(font.render("Password:", True, (0, 0, 0)), (50, 415))
+        screen.blit(font2big.render("Pandemic Protocol", True, (0, 0, 0)), (55, 100))
 
-        # Status Message
         if message:
-            screen.blit(font.render(message, True, (255,0,0)), (100, 220))
-
-        pygame.display.flip()
-
-def main_menu():
-    background1 = pygame.image.load("assets/background1.png")
-    background1 = pygame.transform.scale(background1, (WIDTH, HEIGHT))
-
-    buttons = {
-        "Play": pygame.Rect(540, 300, 200, 60),
-        "How to Play": pygame.Rect(540, 380, 200, 60),
-        "Achievements": pygame.Rect(540, 460, 200, 60)
-    }
-
-    while True:
-        title = font2.render("Pandemic Protocol", True, (0,0,0))
-        screen.blit(background1, (0, 0))
-        screen.blit(title, (WIDTH//2 - title.get_width()//2, 200))
-        # self-centres the title
-        
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                for name, rect in buttons.items():
-                    if rect.collidepoint(event.pos): # links button clicked with respective function
-                        print(f"{name} clicked!")
-                        if name == "Play":
-                            Play()
-                        elif name == "Achievements":
-                            Achievements()
-                        elif name == "How to Play":  
-                            H2P()
-
-        # Draws buttons
-        for name, rect in buttons.items():
-            pygame.draw.rect(screen, (0, 100, 200), rect)
-            text = font.render(name, True, (255,255,255))
-            screen.blit(text, (rect.x + rect.width//2 - text.get_width()//2,
-                               rect.y + rect.height//2 - text.get_height()//2))
+            screen.blit(font.render(message, True, (255, 0, 0)), (100, 220))
 
         pygame.display.flip()
 
@@ -146,7 +98,6 @@ def Play():
         for i, diff in enumerate(difficulties):
             x = start_x + i * (rect_width + spacing)
             diff["rect"] = pygame.Rect(x, y_pos, rect_width, rect_height)
-
 
         running = True
         while running:
@@ -231,7 +182,6 @@ def Play():
 
             pygame.display.flip()
 
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -249,7 +199,6 @@ def Play():
                 elif event.type == pygame.KEYDOWN and active:
                     if event.key == pygame.K_RETURN:
                         disease_name = text_input.strip()
-
 
                         if disease_name:  # only save if non-empty
                             save_folder = "SavedDiseases"
@@ -277,24 +226,20 @@ def Play():
                                 "history": []
                             }
 
-
                             with open(file_path, "w") as f:
                                 json.dump(disease_data, f, indent=4)
 
                             print(f"[+] Disease file created: {file_path}")
                             running = False
-
-
-
                     elif event.key == pygame.K_BACKSPACE:
                         text_input = text_input[:-1]
                     elif len(text_input) < 20:  # character limit
                         text_input += event.unicode
-                 
-            
+                     
     difficulty = difficultyselect()
     if difficulty:  
         diseasesetup()
+        run_map_test()
 
     return True
 
@@ -315,10 +260,223 @@ def Achievements():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
 
+
+
+
+def main_menu():
+    # Main navigation screen (Iteration 1 evidence). Not currently called in Iteration 2.
+    background = pygame.image.load("assets/background1.png")
+    background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+
+    buttons = {
+        "Play": pygame.Rect(540, 300, 200, 60),
+        "How to Play": pygame.Rect(540, 380, 200, 60),
+        "Achievements": pygame.Rect(540, 460, 200, 60)
+    }
+
+    while True:
+        screen.blit(background, (0, 0))
+        title = font2.render("Pandemic Protocol", True, (0, 0, 0))
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 200))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for name, rect in buttons.items():
+                    if rect.collidepoint(event.pos):
+                        # These functions are implemented in later iterations.
+                        if name == "Play":
+                            Play()
+                        elif name == "Achievements":
+                            Achievements()
+                        elif name == "How to Play":
+                            H2P()
+
+        for name, rect in buttons.items():
+            pygame.draw.rect(screen, (0, 100, 200), rect)
+            label = font.render(name, True, (255, 255, 255))
+            screen.blit(
+                label,
+                (rect.centerx - label.get_width() // 2,
+                 rect.centery - label.get_height() // 2)
+            )
+
+        pygame.display.flip()
+
+def run_map_test():
+    from map_system import MapRenderer, Simulation, build_regions_from_config
+    from region_data import REGION_CONFIG
+
+    pygame.display.set_caption("Map + Simulation Test")
+
+    # Single source of truth: REGION_CONFIG keys must match <key>_mask.png
+    region_names = list(REGION_CONFIG.keys())
+    regions = build_regions_from_config()
+
+    # Simulation scaffold: tick loop exists now; disease rules come next.
+    simulation = Simulation(regions=regions)
+    map_renderer = MapRenderer(
+        assets_dir="assets",
+        map_size=(WIDTH, HEIGHT),
+        region_names=region_names
+    )
+
+    clock = pygame.time.Clock()
+
+    selected_region = None
+    start_region = None
+    simulation_started = False
+
+    start_message = ""
+    start_message_timer = 0
+
+    HUD_H = 90
+    HUD_Y = HEIGHT - HUD_H
+    PROGRESS_H = 16
+
+    TICKS_PER_SECOND = 2
+    TICK_INTERVAL = 1.0 / TICKS_PER_SECOND
+    TICKS_PER_DAY = 6
+
+    accumulator = 0.0
+    tick_count = 0
+    day_count = 0
+
+    def handle_events():
+        """Input handling. First land click selects the outbreak start and begins the tick clock."""
+        nonlocal selected_region, start_region, simulation_started, start_message, start_message_timer
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return False
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                clicked_region = map_renderer.get_region_at(event.pos)
+                selected_region = clicked_region
+
+                if not simulation_started and clicked_region is not None:
+                    start_region = clicked_region
+                    simulation_started = True
+                    start_message = f"Outbreak starts in {start_region.replace('_',' ').title()}"
+                    start_message_timer = 180
+
+        return True
+
+    def update_simulation(dt):
+        """Tick pacing + day counter. Time only advances once a start region is chosen."""
+        nonlocal accumulator, tick_count, day_count
+
+        accumulator += dt
+
+        if simulation_started:
+            while accumulator >= TICK_INTERVAL:
+                simulation.update_one_tick()
+
+                tick_count += 1
+                if tick_count % TICKS_PER_DAY == 0:
+                    day_count += 1
+
+                accumulator -= TICK_INTERVAL
+        else:
+            accumulator = 0.0
+
+    def resolve_display_stats():
+        """Returns the label + infected/dead values for the HUD (region view or global totals)."""
+        if selected_region is None:
+            display_region = "Global"
+            display_infected = sum(r.infected for r in regions.values())
+            display_dead = sum(r.dead for r in regions.values())
+            return display_region, display_infected, display_dead
+
+        display_region = selected_region.replace("_", " ").title()
+        display_infected = regions[selected_region].infected
+        display_dead = regions[selected_region].dead
+        return display_region, display_infected, display_dead
+
+    def draw_frame(display_region, display_infected, display_dead):
+        """Draws the map, prompts/messages, day box, and HUD. Layout remains hard-coded."""
+        nonlocal start_message_timer
+
+        region_colours = {name: r.colour_rgba for name, r in regions.items()}
+        map_renderer.draw(screen, region_colours)
+
+        # Start prompt (shown until the player chooses a start region)
+        if not simulation_started:
+            prompt = font.render("Select a country to start the outbreak", True, (255, 255, 255))
+            screen.blit(prompt, (WIDTH // 2 - prompt.get_width() // 2, 580))
+
+        # Start message (fades out)
+        if start_message_timer > 0:
+            alpha = int(255 * (start_message_timer / 180))
+            surf = font.render(start_message, True, (255, 255, 255))
+            surf.set_alpha(alpha)
+            screen.blit(surf, (20, 20))
+            start_message_timer -= 1
+
+        # Day box
+        pygame.draw.rect(screen, (40, 40, 40), (1080, 10, 190, 50))
+        pygame.draw.rect(screen, (0, 0, 0), (1080, 10, 190, 50), 2)
+        day_text = f"Day {day_count}" if simulation_started else "Day 0"
+        screen.blit(font.render(day_text, True, (255, 255, 255)), (1090, 22))
+
+        # Bottom HUD boxes
+        mut_box = pygame.Rect(0, HUD_Y, 180, HUD_H)
+        inf_box = pygame.Rect(180, HUD_Y, 240, HUD_H)
+        region_box = pygame.Rect(420, HUD_Y, 520, HUD_H)
+        death_box = pygame.Rect(940, HUD_Y, 240, HUD_H)
+        cure_box = pygame.Rect(1180, HUD_Y, 100, HUD_H)
+
+        region_text_h = HUD_H - PROGRESS_H
+        region_text_box = pygame.Rect(region_box.x, region_box.y, region_box.width, region_text_h)
+        region_progress_box = pygame.Rect(region_box.x, region_box.y + region_text_h, region_box.width, PROGRESS_H)
+
+        pygame.draw.rect(screen, (120, 40, 40), mut_box)
+        pygame.draw.rect(screen, (80, 80, 80), inf_box)
+        pygame.draw.rect(screen, (80, 80, 80), region_text_box)
+        pygame.draw.rect(screen, (40, 40, 40), region_progress_box)
+        pygame.draw.rect(screen, (80, 80, 80), death_box)
+        pygame.draw.rect(screen, (40, 120, 160), cure_box)
+
+        for box in (mut_box, inf_box, region_box, death_box, cure_box):
+            pygame.draw.rect(screen, (0, 0, 0), box, 2)
+
+        pygame.draw.rect(screen, (0, 0, 0), region_progress_box, 2)
+
+        screen.blit(font.render("Mutations", True, (255, 255, 255)), (mut_box.x + 10, mut_box.y + 10))
+        screen.blit(font.render("Infections", True, (255, 255, 255)), (inf_box.x + 10, inf_box.y + 10))
+        screen.blit(font.render(f"{display_infected:,}", True, (255, 255, 255)), (inf_box.x + 10, inf_box.y + 40))
+        screen.blit(font.render("Region", True, (255, 255, 255)), (region_text_box.x + 10, region_text_box.y + 10))
+        screen.blit(font.render(display_region, True, (255, 255, 255)), (region_text_box.x + 10, region_text_box.y + 40))
+        screen.blit(font.render("Deaths", True, (255, 255, 255)), (death_box.x + 10, death_box.y + 10))
+        screen.blit(font.render(f"{display_dead:,}", True, (255, 255, 255)), (death_box.x + 10, death_box.y + 40))
+        screen.blit(font.render("Cure", True, (255, 255, 255)), (cure_box.x + 10, cure_box.y + 10))
+
+    running = True
+    while running:
+        dt = clock.tick(60) / 1000.0
+
+        running = handle_events()
+        update_simulation(dt)
+
+        display_region, display_infected, display_dead = resolve_display_stats()
+        draw_frame(display_region, display_infected, display_dead)
+
+        pygame.display.flip()
+
+    pygame.quit()
+
 def H2P():
     background2 = pygame.image.load("assets/background2.png")
     background2 = pygame.transform.scale(background2, (WIDTH, HEIGHT))
     running = True
+
+
 
     h2ptext = [
     "Strategically evolve your disease to infect the entire world before a cure is developed.",
@@ -358,7 +516,6 @@ def H2P():
 
         pygame.display.flip()
         
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -366,11 +523,4 @@ def H2P():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
 
-
-# Main Program Flow
-
-
-if login_screen():
-    main_menu()
-
-
+run_map_test()
