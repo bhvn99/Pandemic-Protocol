@@ -1,13 +1,13 @@
 {
-    "name": "hi",
+    "name": "eee",
     "difficulty": "easy",
     "initial_infected": 1000,
     "log_interval_days": 5,
     "history": [],
     "wiped_out_order": [],
-    "infectivity_rate": 1000,
-    "severity_rate": 0.9999,
-    "lethality_rate": 0.9999,
+    "infectivity_rate": 3,
+    "severity_rate": 0.5,
+    "lethality_rate": 0.5,
     "incubation_days": 3,
     "timestamp_created": 0
 }
